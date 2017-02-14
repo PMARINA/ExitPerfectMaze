@@ -44,10 +44,11 @@ public class Maze{
 	}
 	private static void generateSolution(){
 		explore(buffer,buffer);
-		for(Coord i:direction)System.out.println("("+i.x+", "+ i.y+")");
+		//for(Coord i:direction)System.out.println("("+i.x+", "+ i.y+")");
 		System.out.println("Done");	
 	}
 	private static boolean done = false;
+	
 	private static void explore(int x, int y){
 		visited[x][y] = true;
 		direction.add((new Coord(x,y)));
@@ -56,24 +57,46 @@ public class Maze{
 		
 			if(!visited[x][y+1] && !north[x][y]){
 				explore(x,y+1);
-				if(!done)direction.add((new Coord(x,y)));
+				if(!done){
+					// direction.add((new Coord(x,y)));
+					//for(Coord i:direction)System.out.println(i.x + ", " + i.y);
+					for(int i = direction.lastIndexOf(new Coord(x,y))+1; i<direction.size();i++){
+						direction.remove(direction.size()-1);
+					}
+				}
 			}
 			if(done)return;
 			if(!visited[x+1][y] && !east[x][y]){
 				explore(x+1,y);
-				if(!done)direction.add((new Coord(x,y)));
+				if(!done){
+					// direction.add((new Coord(x,y)));
+					for(int i = direction.lastIndexOf(new Coord(x,y)); i<direction.size();i++){
+						direction.remove(direction.size()-1);
+					}
+				}
 			}
 			if(done)return;
 			if(!visited[x-1][y] && !west[x][y]){
 				explore(x-1,y);
-				if(!done)direction.add((new Coord(x,y)));
+				if(!done){
+					// direction.add((new Coord(x,y)));
+					for(int i = direction.lastIndexOf(new Coord(x,y)); i<direction.size();i++){
+						direction.remove(direction.size()-1);
+					}
+				}
 			}
 			if(done)return;
 			if(!visited[x][y-1] && !south[x][y]){
 				explore(x,y-1);
-				if(!done)direction.add((new Coord(x,y)));
+				if(!done){
+					// direction.add((new Coord(x,y)));
+					for(int i = direction.lastIndexOf(new Coord(x,y)); i<direction.size();i++){
+						direction.remove(direction.size()-1);
+					}
+				}
 			}
 			if(done)return;
+			//TODO: Replace part after ever if not done with something that filters out parts between the two points. 
 		
 	}
 	
@@ -246,6 +269,10 @@ public class Maze{
 		public Coord(int x, int y){
 			this.x = x;
 			this.y = y;
+		}
+		@Override
+		public boolean equals(Object a){
+			return this.x == ((Coord) a).x && ((Coord) a).y == this.y;
 		}
 	}
 }
