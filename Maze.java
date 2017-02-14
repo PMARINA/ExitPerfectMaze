@@ -1,10 +1,15 @@
 import java.util.Scanner;
+import java.util.List;
+import java.util.ArrayList;
+import java.awt.Font;
 public class Maze{
 	private static boolean[][] north;
 	private static boolean[][] south;
 	private static boolean[][] east;
 	private static boolean[][] west;
 	private static boolean[][] check;
+	private static List<Coord> direction = new ArrayList<Coord>();
+	private static boolean[][] visited;
 	private final static int buffer = 1; //This is how many extra there will be before and after the actual maze's coordinates, to accomodate special cases;
 
 	public static void main(String[] args) throws Exception{
@@ -15,10 +20,63 @@ public class Maze{
 		//to the north/south/east/west of a given point, and define 
 		//the visited array
 		generateMaze(north.length-buffer-1, buffer);//start at bottom 
+		generateSolution();
 		//left corner
 		drawMaze();//output
 		////("The program is now terminating");
+		StdDraw.setFont(new Font("SansSerif",0,40));
+		StdDraw.setPenColor(StdDraw.BLUE);
+		StdDraw.text((north.length+buffer)/2,(north.length+buffer)/2,"Press any key to continue");
+		while(!StdDraw.hasNextKeyTyped()){
+			String s = "";
+		}
+		StdDraw.clear();
+		drawMaze();
+		drawRoute();
+		
+		
 	}
+	private static void drawRoute(){
+		StdDraw.setPenColor(StdDraw.GREEN);
+		for(int i = 1; i<direction.size();i++){
+			StdDraw.line(direction.get(i).x,direction.get(i).y,direction.get(i-1).x,direction.get(i-1).y);
+		}
+	}
+	private static void generateSolution(){
+		explore(buffer,buffer);
+		for(Coord i:direction)System.out.println("("+i.x+", "+ i.y+")");
+		System.out.println("Done");	
+	}
+	private static boolean done = false;
+	private static void explore(int x, int y){
+		visited[x][y] = true;
+		direction.add((new Coord(x,y)));
+		if(x == north.length-2*buffer && y == north.length-2*buffer)done = true;
+		if(done)return;
+		
+			if(!visited[x][y+1] && !north[x][y]){
+				explore(x,y+1);
+				if(!done)direction.add((new Coord(x,y)));
+			}
+			if(done)return;
+			if(!visited[x+1][y] && !east[x][y]){
+				explore(x+1,y);
+				if(!done)direction.add((new Coord(x,y)));
+			}
+			if(done)return;
+			if(!visited[x-1][y] && !west[x][y]){
+				explore(x-1,y);
+				if(!done)direction.add((new Coord(x,y)));
+			}
+			if(done)return;
+			if(!visited[x][y-1] && !south[x][y]){
+				explore(x,y-1);
+				if(!done)direction.add((new Coord(x,y)));
+			}
+			if(done)return;
+		
+	}
+	
 	/*Takes the north/west/east/south arrays and uses them to draw the maze. 
 	 * Lines will be drawn with length 1, 0.5 above/below/left of/right of 
 	 * the center of the cell. Note that since arrays count from top left
@@ -178,7 +236,16 @@ public class Maze{
 		west  = new boolean[n+2*buffer][n+2*buffer];
 		for(int i = 0; i< west.length;i++)for(int j = 0; j< west[i].length;j++) west[i][j] = true;
 		check = new boolean[n+2*buffer][n+2*buffer];
-		for(int i = 0; i<check.length;i++)for(int j = 0; j<check[i].length;j++) check[i][j] = true;
-		for(int i = buffer; i<check.length-buffer;i++)for(int j = buffer; j<check[i].length-buffer;j++)check[i][j] = false;
+		visited = new boolean[n+2*buffer][n+2*buffer];
+		for(int i = 0; i<check.length;i++)for(int j = 0; j<check[i].length;j++){ check[i][j] = true; visited[i][j] =true;}
+		for(int i = buffer; i<check.length-buffer;i++)for(int j = buffer; j<check[i].length-buffer;j++){check[i][j] = false;visited[i][j]=false;}
+	}
+	private static class Coord{
+		public int x;
+		public int y;
+		public Coord(int x, int y){
+			this.x = x;
+			this.y = y;
+		}
 	}
 }
